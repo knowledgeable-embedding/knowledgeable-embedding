@@ -16,7 +16,7 @@ from transformers import (
     TrainingArguments,
     set_seed,
 )
-from transformers.deepspeed import is_deepspeed_zero3_enabled
+from transformers.integrations.deepspeed import is_deepspeed_zero3_enabled
 
 from kembed.arguments import DataArguments, EntityEmbeddingArguments, ModelArguments
 from kembed.configuration import KPRConfigForBert, KPRConfigForXLMRoberta

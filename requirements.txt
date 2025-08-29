@@ -9,5 +9,5 @@ regex==2024.7.24
 sentencepiece==0.1.99
 spacy==3.7.6
 torch==2.4.0
-transformers==4.35.2
+transformers==4.55.4
 tqdm==4.65.0
