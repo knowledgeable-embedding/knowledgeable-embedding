@@ -155,7 +155,9 @@ class EntityFusionLayer(nn.Module):
 
 
 class KPRMixin:
-    def _forward(self, **inputs: dict[str, Tensor]) -> tuple[Tensor] | tuple[Tensor, Tensor] | ModelOutput:
+    def _forward(
+        self, **inputs: Tensor | bool | None | dict[str, Tensor | bool | None]
+    ) -> tuple[Tensor] | tuple[Tensor, Tensor] | ModelOutput:
         return_dict = inputs.pop("return_dict", True)
 
         if self.training:
@@ -185,7 +187,7 @@ class KPRMixin:
             else:
                 return (sentence_embeddings,)
 
-    def encode(self, **inputs: dict[str, Tensor]) -> Tensor:
+    def encode(self, **inputs: Tensor | bool | None) -> Tensor:
         entity_ids = inputs.pop("entity_ids", None)
         entity_position_ids = inputs.pop("entity_position_ids", None)
         entity_embeds = inputs.pop("entity_embeds", None)
@@ -231,8 +233,37 @@ class KPRModelForBert(BertPreTrainedModel, KPRMixin):
 
         self.post_init()
 
-    def forward(self, *args, **kwargs):
-        return self._forward(*args, **kwargs)
+    def forward(
+        self,
+        input_ids: torch.Tensor | None = None,
+        attention_mask: torch.Tensor | None = None,
+        token_type_ids: torch.Tensor | None = None,
+        position_ids: torch.Tensor | None = None,
+        head_mask: torch.Tensor | None = None,
+        inputs_embeds: torch.Tensor | None = None,
+        entity_ids: torch.Tensor | None = None,
+        entity_position_ids: torch.Tensor | None = None,
+        entity_embeds: torch.Tensor | None = None,
+        output_attentions: bool | None = None,
+        output_hidden_states: bool | None = None,
+        return_dict: bool | None = None,
+        **kwargs
+    ):
+        return self._forward(
+            input_ids=input_ids,
+            attention_mask=attention_mask,
+            token_type_ids=token_type_ids,
+            position_ids=position_ids,
+            head_mask=head_mask,
+            inputs_embeds=inputs_embeds,
+            entity_ids=entity_ids,
+            entity_position_ids=entity_position_ids,
+            entity_embeds=entity_embeds,
+            output_attentions=output_attentions,
+            output_hidden_states=output_hidden_states,
+            return_dict=return_dict,
+            **kwargs
+        )
 
 
 class KPRModelForXLMRoberta(XLMRobertaPreTrainedModel, KPRMixin):
@@ -247,5 +278,34 @@ class KPRModelForXLMRoberta(XLMRobertaPreTrainedModel, KPRMixin):
 
         self.post_init()
 
-    def forward(self, *args, **kwargs):
-        return self._forward(*args, **kwargs)
+    def forward(
+        self,
+        input_ids: torch.Tensor | None = None,
+        attention_mask: torch.Tensor | None = None,
+        token_type_ids: torch.Tensor | None = None,
+        position_ids: torch.Tensor | None = None,
+        head_mask: torch.Tensor | None = None,
+        inputs_embeds: torch.Tensor | None = None,
+        entity_ids: torch.Tensor | None = None,
+        entity_position_ids: torch.Tensor | None = None,
+        entity_embeds: torch.Tensor | None = None,
+        output_attentions: bool | None = None,
+        output_hidden_states: bool | None = None,
+        return_dict: bool | None = None,
+        **kwargs
+    ):
+        return self._forward(
+            input_ids=input_ids,
+            attention_mask=attention_mask,
+            token_type_ids=token_type_ids,
+            position_ids=position_ids,
+            head_mask=head_mask,
+            inputs_embeds=inputs_embeds,
+            entity_ids=entity_ids,
+            entity_position_ids=entity_position_ids,
+            entity_embeds=entity_embeds,
+            output_attentions=output_attentions,
+            output_hidden_states=output_hidden_states,
+            return_dict=return_dict,
+            **kwargs
+        )
