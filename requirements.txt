@@ -7,6 +7,7 @@ mwparserfromhell==0.6.6
 refined @ git+https://github.com/amazon-science/ReFinED@V1
 regex==2024.7.24
 sentencepiece==0.1.99
+sentence_transformers @ git+https://github.com/UKPLab/sentence-transformers.git@ad8d27d
 spacy==3.7.6
 torch==2.4.0
 transformers==4.55.4

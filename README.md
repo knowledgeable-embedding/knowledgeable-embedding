@@ -26,11 +26,15 @@ Although RAG typically relies on embedding-based retrieval, the embedding models
 | [knowledgeable-ai/kpr-bge-base-en-v1.5](https://huggingface.co/knowledgeable-ai/kpr-bge-base-en-v1.5) | 112M | [bge-base-en-v1.5](https://huggingface.co/BAAI/bge-base-en-v1.5) |
 | [knowledgeable-ai/kpr-bge-large-en-v1.5](https://huggingface.co/knowledgeable-ai/kpr-bge-large-en-v1.5) | 340M | [bge-large-en-v1.5](https://huggingface.co/BAAI/bge-large-en-v1.5) |
 
-For practical use, we recommend `knowledgeable-ai/kpr-bge-*`, which significantly outperforms other models on queries involving less-frequent entities while performing comparably on other queries, as reported in [our paper](https://arxiv.org/abs/2507.03922).
+For practical use, we recommend `knowledgeable-ai/kpr-bge-*`, which significantly outperforms state-of-the-art models on queries involving less-frequent entities while performing comparably on other queries, as reported in [our paper](https://arxiv.org/abs/2507.03922).
 
 Regarding the model size, we do not count the entity embeddings since they are stored in CPU memory and have a negligible impact on runtime performance. See [this page](https://github.com/knowledgeable-embedding/knowledgeable-embedding/wiki/Internals-of-Knowledgeable-Embedding) for details.
 
 ## Usage
+
+Our trained models can be used via [Hugging Face Transformers](https://github.com/huggingface/transformers) or [Sentence Transformers](https://github.com/UKPLab/sentence-transformers):
+
+### Hugging Face Transformers
 
 ```python
 from transformers import AutoTokenizer, AutoModel
@@ -43,17 +47,46 @@ input_texts = [
   "Who owns Mompesson House?"
 ]
 
-# Load model and tokenizer from Hugging Face Hub
+# Load model and tokenizer from the Hugging Face Hub
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME_OR_PATH, trust_remote_code=True)
 model = AutoModel.from_pretrained(MODEL_NAME_OR_PATH, trust_remote_code=True)
 
 # Preprocess the text
 preprocessed_inputs = tokenizer(input_texts, return_tensors="pt", padding=True)
 
+# Compute embeddings
 with torch.no_grad():
     embeddings = model.encode(**preprocessed_inputs)
 
 print("Embeddings:", embeddings)
+```
+
+### Sentence Transformers
+
+```python
+from sentence_transformers import SentenceTransformer
+
+MODEL_NAME_OR_PATH = "knowledgeable-ai/kpr-bge-base-en"
+
+input_texts = [
+  "Who founded Dominican Liberation Party?",
+  "Who owns Mompesson House?"
+]
+
+# Load model from the Hugging Face Hub
+model = SentenceTransformer(MODEL_NAME_OR_PATH, trust_remote_code=True)
+
+# Compute embeddings
+embeddings = model.encode(input_texts)
+
+print("Embeddings:", embeddings)
+```
+
+**IMPORTANT:** This code will be supported in versions of Sentence Transformers later than v5.1.0,  
+which have not yet been released at the time of writing. Until then, please install the library directly from GitHub:
+
+```bash
+pip install git+https://github.com/UKPLab/sentence-transformers.git
 ```
 
 ## Installation
@@ -71,34 +104,50 @@ In this toolkit, an entity refers to an entry in a knowledge base (i.e., a set o
 
 ## How to Update Entity Knowledge
 
-The entity knowledge injected into embeddings can be easily updated without retraining. The knowledge is stored in dedicated entity embeddings included in the Hugging Face-compatible tokenizer. The tokenizer uses an entity linker to detect entities mentioned in the text and outputs their corresponding embeddings. To update the knowledge, a new tokenizer must be built with updated entity embeddings and an updated entity linker. Refer to [this wiki page](https://github.com/knowledgeable-embedding/knowledgeable-embedding/wiki/Internals-of-Knowledgeable-Embedding) for technical details.
+The entity knowledge injected into embeddings can be easily updated without retraining. The knowledge is stored in dedicated entity embeddings included in the Hugging Face-compatible tokenizer. The tokenizer uses an entity linker to detect entities mentioned in the text and outputs their corresponding embeddings. To update the knowledge, you need to build a model together with a new tokenizer that includes updated entity embeddings and an updated entity linker. Refer to [this wiki page](https://github.com/knowledgeable-embedding/knowledgeable-embedding/wiki/Internals-of-Knowledgeable-Embedding) for technical details.
 
 ### Updating Entity Knowledge from Wikipedia
 
-The entity embeddings and entity linker can be easily built by following the instructions on the [Building Entity Linker and Entity Embeddings from Wikipedia](https://github.com/knowledgeable-embedding/knowledgeable-embedding/wiki/Building-Entity-Linker-and-Entity-Embeddings-from-Wikipedia) wiki page.
+The entity embeddings and entity linker can be built by following the instructions on the  
+[Building Entity Linker and Entity Embeddings from Wikipedia](https://github.com/knowledgeable-embedding/knowledgeable-embedding/wiki/Building-Entity-Linker-and-Entity-Embeddings-from-Wikipedia) wiki page.
 
-A new tokenizer with updated entity knowledge can be created by running `build_hf_tokenizer.py` with the updated entity vocabulary, entity embeddings, and entity linker.
-The tokenizer can be pushed to the Hugging Face Hub by specifying the repository ID with `--hf_repo_id`.
+To update entity knowledge, create a new model by running `build_hf_model.py` with the updated entity vocabulary, embeddings, and linker.  
+You can then push the model to the Hugging Face Hub by specifying the repository ID with `--hf_repo_id`.  
+Adding the `--private` flag will upload the model as private.
 
 ```bash
-python scripts/build_hf_tokenizer.py \
-  --output_dir <OUTPUT_DIR> \
+# Target model for updating entity knowledge
+MODEL_NAME_OR_PATH = "knowledgeable-ai/kpr-bge-base-en"
+
+python scripts/build_hf_model.py \
+  --model_name_or_path ${MODEL_NAME_OR_PATH} \
   --entity_linker_dir <ENTITY_LINKER_DIR> \
   --entity_embedding_dir <ENTITY_EMBEDDING_DIR> \
   --entity_vocab_file <ENTITY_VOCAB_FILE> \
+  --output_dir <OUTPUT_DIR> \
   --hf_repo_id your_name/tokenizer_name
 ```
 
-The tokenizer can also be loaded locally:
+The model can be loaded locally:
 
 ```python
->>> tokenizer = AutoTokenizer.from_pretrained("<OUTPUT_DIR>", trust_remote_code=True)
+# Hugging Face Transformers
+model = AutoModel.from_pretrained("<OUTPUT_DIR>", trust_remote_code=True)
+tokenizer = AutoTokenizer.from_pretrained("<OUTPUT_DIR>", trust_remote_code=True)
+
+# Sentence Transformers
+model = SentenceTransformer("<OUTPUT_DIR>", trust_remote_code=True)
 ```
 
 Or directly from the Hugging Face Hub (if uploaded):
 
 ```python
->>> tokenizer = AutoTokenizer.from_pretrained("your_name/tokenizer_name", trust_remote_code=True)
+# Hugging Face Transformers
+model = AutoModel.from_pretrained("your_name/model_name", trust_remote_code=True)
+tokenizer = AutoTokenizer.from_pretrained("your_name/model_name", trust_remote_code=True)
+
+# Sentence Transformers
+model = SentenceTransformer("your_name/model_name", trust_remote_code=True)
 ```
 
 New entity knowledge can be injected by using a new tokenizer instead of the tokenizer bundled with the model.
