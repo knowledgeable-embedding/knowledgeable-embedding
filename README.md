@@ -32,7 +32,7 @@ Regarding the model size, we do not count the entity embeddings since they are s
 
 ## Usage
 
-Our trained models can be used via [Hugging Face Transformers](https://github.com/huggingface/transformers) or [Sentence Transformers](https://github.com/UKPLab/sentence-transformers):
+Our models can be used via [Hugging Face Transformers](https://github.com/huggingface/transformers) or [Sentence Transformers](https://github.com/UKPLab/sentence-transformers):
 
 ### Hugging Face Transformers
 
@@ -82,8 +82,7 @@ embeddings = model.encode(input_texts)
 print("Embeddings:", embeddings)
 ```
 
-**IMPORTANT:** This code will be supported in versions of Sentence Transformers later than v5.1.0,  
-which have not yet been released at the time of writing. Until then, please install the library directly from GitHub:
+**IMPORTANT:** This code will be supported in versions of Sentence Transformers later than v5.1.0, which have not yet been released at the time of writing. Until then, please install the library directly from GitHub:
 
 ```bash
 pip install git+https://github.com/UKPLab/sentence-transformers.git
@@ -149,8 +148,6 @@ tokenizer = AutoTokenizer.from_pretrained("your_name/model_name", trust_remote_c
 # Sentence Transformers
 model = SentenceTransformer("your_name/model_name", trust_remote_code=True)
 ```
-
-New entity knowledge can be injected by using a new tokenizer instead of the tokenizer bundled with the model.
 
 ### Updating Entity Knowledge from Custom Data Source
 
