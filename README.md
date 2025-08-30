@@ -12,9 +12,9 @@
 
 A key limitation of large language models (LLMs) is their inability to capture less-frequent or up-to-date entity knowledge, often leading to factual inaccuracies and hallucinations. Retrieval-augmented generation (RAG), which incorporates external knowledge through retrieval, is a common approach to mitigate this issue.
 
-Although RAG typically relies on embedding-based retrieval, the embedding models themselves are also based on language models and therefore struggle with queries involving less-frequent entities, often failing to retrieve the crucial knowledge needed to overcome this limitation.
+Although RAG typically relies on embedding-based retrieval, the embedding models themselves are also based on language models and therefore struggle with queries involving less-frequent entities ([Sciavolino et al., 2021](https://arxiv.org/abs/2109.08535)), often failing to retrieve the crucial knowledge needed to overcome this limitation.
 
-**Knowledgeable Embedding** is a toolkit that addresses this challenge by injecting real-world entity knowledge into embeddings, making them more *knowledgeable*. **The entity knowledge is pluggable and can be dynamically updated with ease**.
+**Knowledgeable Embedding** addresses this challenge by injecting real-world entity knowledge into embeddings, making them more *knowledgeable*. **The entity knowledge is pluggable and can be dynamically updated with ease**.
 
 ## Models
 
