@@ -58,7 +58,7 @@ preprocessed_inputs = tokenizer(input_texts, return_tensors="pt", padding=True)
 
 # Compute embeddings
 with torch.no_grad():
-    embeddings = model.encode(**preprocessed_inputs)
+  embeddings = model.encode(**preprocessed_inputs)
 
 print("Embeddings:", embeddings)
 ```
