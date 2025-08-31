@@ -23,12 +23,12 @@ def main(args: argparse.Namespace) -> None:
 
     temp_dir_cm = tempfile.TemporaryDirectory() if args.temp_dir is None else contextlib.nullcontext(args.temp_dir)
     with temp_dir_cm as temp_dir:
-        if model.config.entity_vocab_size is None:  # The model has already been converted with this script
+        if model.config.entity_vocab_size is None:
             logger.info("The model has already been converted with this script.")
             entity_embedding_norm = None
             tokenizer = AutoTokenizer.from_pretrained(args.model_name_or_path, trust_remote_code=True)
 
-        else:  # The model has not been converted with this script
+        else:
             logger.info("The model has not been converted with this script.")
             model.config.entity_vocab_size = None
             entity_embedding_norm = (
@@ -44,7 +44,7 @@ def main(args: argparse.Namespace) -> None:
 
         model.save_pretrained(temp_dir)
         tokenizer.save_pretrained(temp_dir)
-        del model, tokenizer
+        del tokenizer
 
         if os.path.exists(os.path.join(temp_dir, "entity_linker")):
             shutil.rmtree(os.path.join(temp_dir, "entity_linker"))
