@@ -106,7 +106,7 @@ if __name__ == "__main__":
         default="knowledgeable-ai/kpr-bert-tokenizer",
         help="Hugging Face repository ID of the base tokenizer. Used only if the model has not yet been converted with this script.",
     )
-    parser.add_argument("--output_dir", type=str, help="Output directory to save the tokenizer")
+    parser.add_argument("--output_dir", type=str, help="Output directory to save the model")
     parser.add_argument("--temp_dir", type=str, help="Temporary directory for intermediate files")
     parser.add_argument(
         "--entity_linker_dir", type=str, required=True, help="Path to the directory containing the entity linker data"
